@@ -9,8 +9,17 @@ import HomePage from './components/pages/HomePage'
 import GalleryPage from './components/pages/GalleryPage'
 import SinglePage from './components/pages/SinglePage'
 import ArticlesPage from './components/pages/ArticlesPage'
+import { useAppDispatch } from './hooks/customHooks'
+import { fetchFeedPosts } from './store/globalSlice'
+import { useEffect } from 'react'
 
 function App() {
+
+   const dispatch = useAppDispatch();
+
+   useEffect(() => {
+      dispatch(fetchFeedPosts());
+   }, [dispatch]);
 
    return (
       <>

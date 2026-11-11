@@ -12,7 +12,6 @@ export interface Article
    slug: string;
    title: string;
    subtitle?: string;
-   continent: string;
    country: string;
    city: string;
    excerpt: string;
