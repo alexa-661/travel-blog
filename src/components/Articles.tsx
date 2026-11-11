@@ -62,21 +62,27 @@ const Articles = (Props: { selectedCountry: string, onCountryChange: (country: s
                               objectPosition: 'center'
                            }}
                         />
-                     </div>
-                     <figcaption style={{ textAlign: 'center' }}>
-                        {headerImage.caption ?? headerImage.title}
-                     </figcaption>                  
+                     </div>              
                   </figure>
                </div>
             }
-            <div style={{ flex: '3 1 0', minWidth: 0, margin: 0, padding: '2rem', textAlign: 'left' }}>
+            <div style={{ flex: '3 1 0', minWidth: 0, margin: 0, padding: '2rem', textAlign: 'left', display: 'flex', flexDirection: 'column' }}>
                <Link to={`/articles/${article.slug}`}>
                   <h2>{article.title}</h2>
                </Link>
-               <h3>{article.subtitle}</h3>
-               <p>{article.location.country}, {article.location.city}</p>
-               <p>{article.excerpt}</p>
-               <button>Read More</button>
+               <h3 style={{ margin: 0 }}>{article.subtitle}</h3>
+               <p style={{ margin: 0 }}>{article.location.country}, {article.location.city}</p>
+               <p style={{ margin: 0 }}>{article.excerpt}</p>
+               <Link
+                  to={`/articles/${article.slug}`}
+                  style={{
+                     alignSelf: 'flex-end',
+                     marginTop: '0.5rem',
+                     textDecoration: 'none',
+                  }}
+               >
+                  Read More
+               </Link>
             </div>
          </div>
       );
@@ -85,7 +91,7 @@ const Articles = (Props: { selectedCountry: string, onCountryChange: (country: s
    return (
       <div style={{ margin: '1rem' }}>
          <CountryFilter selectedCountry={Props.selectedCountry} onCountryChange={Props.onCountryChange} />
-         <section className="articles">{articleJSX}</section>;
+         <section className="articles">{articleJSX}</section>
       </div>
    )
 };

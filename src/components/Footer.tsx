@@ -1,7 +1,7 @@
 
 const Footer = () => {
    return (
-      <footer>
+      <footer style={{ marginTop: 'auto' }}>
          <div>
             <p>&copy; {new Date().getFullYear()} The World Is Still Beautiful. All rights reserved.</p>
          </div>
