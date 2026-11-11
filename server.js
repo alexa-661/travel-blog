@@ -16,7 +16,6 @@ app.get('/api/posts', async (_req, res) => {
         url: item.link,
         creator: item.creator,
         publishedAt: item.pubDate,
-        headerImage: item.enclosure['url'],
         content: item['content:encoded'],
       })),
     )

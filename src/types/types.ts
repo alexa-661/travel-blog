@@ -14,6 +14,7 @@ export interface Article
    subtitle?: string;
    country: string;
    city: string;
+   content: string;
    excerpt: string;
    coordinates: {
       latitude: number;
@@ -22,5 +23,13 @@ export interface Article
    headerImage: Image,
    galleryImages?: Image[]
 }
+
+export type FeedPost = {
+   title?: string;
+   subTitle?: string;
+   url?: string;
+   publishedAt?: string;
+   content?: string; //XML string
+};
 
 export type Language = (typeof languageOptions)[number]; //the type of any element in this array. 

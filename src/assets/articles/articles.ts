@@ -12,6 +12,7 @@ export const articles: Article[] = [
       country: 'Canada',
       city: 'Whitehorse',
       excerpt: 'When I close my eyes and think about last summer, I see myself lying diagonally across the back of a rented Bronco, attempting to sleep while sweating inside a too-warm sleeping bag.',
+      content: '',
       coordinates: {
          latitude: 60.7212,
          longitude: -135.0568
@@ -29,6 +30,7 @@ export const articles: Article[] = [
       country: 'Canada',
       city: 'Halifax',
       excerpt: 'It’s a hazy, warm August day, the air smelling of salt. A rainbow halo circles the sun, formed from the combination of sunlight and wildfire smoke drifting in from—of all places—Newfoundland.',
+      content: '',
       coordinates: {
          latitude: 44.6488,
          longitude: -63.5824
@@ -46,6 +48,7 @@ export const articles: Article[] = [
       country: 'Canada',
       city: 'Saguenay',
       excerpt: 'Saguenay appears to be frozen in time, an exact replica of the town I first stumbled upon all those years ago. For me, visiting this town is like looking at life in a rear-view mirror. Everything looks the same, and yet everything is so very different.',
+      content: '',
       coordinates: {
          latitude: 48.428,
          longitude: -71.068,
@@ -63,6 +66,7 @@ export const articles: Article[] = [
       country: 'Japan',
       city: 'Koyasan',
       excerpt: 'On the advice of a friend who had once lived here, I make my way south. I hop on and off a series of trains, a funicular, and a bus, all steadily climbing upwards, until I stand before a giant two-story red wooden gate.',
+      content: '',
       coordinates: {
          latitude: 34.207,
          longitude: 135.586

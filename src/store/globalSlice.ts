@@ -1,17 +1,8 @@
 import { createSlice, configureStore, type PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { languageOptions } from '../constants/constants';
-import type { Language } from '../types/types';
+import type { FeedPost, Language } from '../types/types';
 
 type ArticlesStatus = "idle" | "loading" | "succeeded" | "failed";
-
-type FeedPost = {
-   title?: string;
-   subTitle?: string;
-   url?: string;
-   publishedAt?: string;
-   headerImage?: string;
-   content?: string;
-};
 
 interface GlobalState {
    selectedLanguage: Language;
