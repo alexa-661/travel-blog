@@ -3,6 +3,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import { useEffect, useRef } from 'react';
 import * as maplibregl from 'maplibre-gl';
+import Articles from './Articles';
 
 setWorkerUrl(workerUrl);
 
@@ -37,10 +38,13 @@ const GlobalMap = () => {
    }, []);
       
   return (
-      <div 
-         ref={mapContainer}
-         style={{ width: '100%', height: '400px' }}
-      />
+      <>
+         <div 
+            ref={mapContainer}
+            style={{ width: '100%', height: '400px' }}
+         />
+         <Articles />
+      </>
   );
 };
 
