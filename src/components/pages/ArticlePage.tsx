@@ -1,9 +1,10 @@
+import { useAppSelector } from "../../hooks/customHooks";
 import type { Article } from "../../types/types";
-import { articles } from "../../assets/articles/articles";
 import { useParams } from "react-router";
 
 const ArticlePage = () => {
    const { slug } = useParams<{ slug: string }>();
+   const articles = useAppSelector((state) => state.global.articles);
    const article = articles.find((article: Article) => article.slug === slug);
 
    if (!article) {
@@ -43,7 +44,11 @@ const ArticlePage = () => {
             <figcaption>{article.headerImage.caption}</figcaption>
          </figure>
          <div style={{ padding: '2rem', textAlign: 'left' }}>
-            <p>{article.excerpt}</p>
+            <article 
+               style={{ maxWidth: '100%', height: 'auto' }}
+               dangerouslySetInnerHTML={{ __html: article.content }}
+               className="article-content"
+            />
          </div>
       </div>
    );

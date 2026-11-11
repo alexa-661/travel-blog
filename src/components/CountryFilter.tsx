@@ -1,9 +1,10 @@
 import { useMemo } from 'react';
-import { articles } from '../assets/articles/articles';
+import { useAppSelector } from '../hooks/customHooks';
 
 const CountryFilter = (Props: { selectedCountry: string, onCountryChange: (country: string) => void }) => {
    
-   const countryOptions = useMemo(() => new Set(articles.map((article) => article.country)), []);
+   const articles = useAppSelector((state) => state.global.articles);
+   const countryOptions = useMemo(() => new Set(articles.map((article) => article.country)), [articles]);
 
    return (
       <form>
@@ -23,9 +24,7 @@ const CountryFilter = (Props: { selectedCountry: string, onCountryChange: (count
             ))}
          </select>
       </form>
-      
-   );
-
+   )
 }
 
 export default CountryFilter;

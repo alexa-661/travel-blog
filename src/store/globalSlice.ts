@@ -1,12 +1,14 @@
 import { createSlice, configureStore, type PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
+import DOMPurify from 'dompurify';
 import { languageOptions } from '../constants/constants';
-import type { FeedPost, Language } from '../types/types';
+import type { Article, FeedPost, Language } from '../types/types';
+import { parseExcerpt, parseHeaderImage, parseLocation } from '../utils/normalizeFeedPost';
 
 type ArticlesStatus = "idle" | "loading" | "succeeded" | "failed";
 
 interface GlobalState {
    selectedLanguage: Language;
-   articles: FeedPost[];
+   articles: Article[];
    articlesStatus: ArticlesStatus;
    articlesError: string | null;
 }
@@ -18,7 +20,7 @@ const initialState: GlobalState = {
    articlesError: null
 };
 
-export const fetchFeedPosts = createAsyncThunk<FeedPost[]>(
+export const fetchFeedPosts = createAsyncThunk<Article[]>(
    'global/fetchFeedPosts',
    async () =>
    {
@@ -27,9 +29,32 @@ export const fetchFeedPosts = createAsyncThunk<FeedPost[]>(
       {
          throw new Error('Failed to fetch feed posts.');
       }
-      const data: FeedPost[] = await response.json();
-      console.dir(data);
-      return data;
+      const posts: FeedPost[] = await response.json();
+      const normalizedData = posts.flatMap((post) =>
+      {
+         const contentHTML = new DOMParser().parseFromString(post.content ?? '', 'text/html');
+         const location = parseLocation(contentHTML);
+         if (!location  || !post.title || !post.content)
+         {
+            return [];
+         }
+         return [{
+            slug: post.title.toLowerCase().trim().replace(/\s+/g, '-'),
+            title: post.title,
+            subtitle: post.subTitle,
+            country: location.country,
+            city: location.city,
+            content: DOMPurify.sanitize(post.content), //may not be necessary here
+            excerpt:parseExcerpt(contentHTML),
+            coordinates: {
+               latitude: 0, //deal with this later
+               longitude: 0
+            },
+            headerImage: parseHeaderImage(contentHTML),
+            // galleryImages?: Image[]
+         }]
+      });
+      return normalizedData;
    }
 );
 

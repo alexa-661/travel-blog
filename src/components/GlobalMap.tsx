@@ -4,7 +4,7 @@ import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import { useEffect, useRef } from 'react';
 import * as maplibregl from 'maplibre-gl';
 import { useNavigate } from 'react-router';
-import { articles } from '../assets/articles/articles';
+import { useAppSelector } from '../hooks/customHooks';
 
 setWorkerUrl(workerUrl);
 
@@ -12,6 +12,7 @@ const GlobalMap = (Props: { selectedCountry: string | null }) => {
    const mapContainer = useRef<HTMLDivElement>(null);
    const mapRef = useRef<Map | null>(null);
    const navigate = useNavigate();
+   const articles = useAppSelector((state) => state.global.articles);
 
    useEffect(() =>
    {
@@ -73,7 +74,7 @@ const GlobalMap = (Props: { selectedCountry: string | null }) => {
          map.remove();
       };
 
-   }, [navigate]);
+   }, [navigate, articles]);
 
    useEffect(() => {
       const map = mapRef.current;
@@ -120,7 +121,7 @@ const GlobalMap = (Props: { selectedCountry: string | null }) => {
       })
 
       map.fitBounds(bounds, { padding: 40, maxZoom: 6, duration: 1000 });
-   }, [Props.selectedCountry]);
+   }, [Props.selectedCountry, articles]);
       
    return (
       <>

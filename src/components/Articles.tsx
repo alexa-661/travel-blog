@@ -1,71 +1,7 @@
 import { Link } from 'react-router';
-import {type Article} from '../types/types'
 import CountryFilter from './CountryFilter';
 import { useMemo } from 'react';
 import { useAppSelector } from '../hooks/customHooks';
-
-const MAX_EXCERPT_WORDCOUNT = 50;
-
-const parseLocation = (content: Document) =>
-{
-   const heading = content.querySelector('h6')?.textContent?.trim();
-
-   if (!heading)
-   {
-      return null;
-   }
-
-   const commaIndex = heading.indexOf(',');
-   if (commaIndex === -1)
-   {
-      return null;
-   }
-
-   console.log("the location is " + heading);
-
-   return {
-      country: heading.slice(0, commaIndex).trim(),
-      city: heading.slice(commaIndex + 1).trim()
-   };
-}
-
-const parseExcerpt = (content: Document) =>
-{
-   const paragraphs = content.querySelectorAll('p');
-   const text = Array.from(paragraphs)
-      .map((paragraph) => paragraph.textContent?.trim() ?? '')
-      .filter((paragraph) => paragraph.length > 0)
-      .join(' ');
-
-   const words = text.split(/\s+/).filter((word) => word.length > 0);
-
-   if (words.length <= MAX_EXCERPT_WORDCOUNT) {
-      return text;
-   }
-
-   return `${words.slice(0, MAX_EXCERPT_WORDCOUNT).join(' ')}...`;
-}
-
-const parseHeaderImage = (content: Document) =>
-{
-   const images = content.querySelectorAll('img');
-   const descriptiveImages = Array.from(images).filter((image) => image.title.length > 0);
-   if (descriptiveImages.length === 0)
-   {
-      return {
-         src: '',
-         alt: '',
-         caption: 'No Image to Display'
-      }
-   }
-
-   return {
-      src: descriptiveImages[0].src,
-      alt: descriptiveImages[0].alt ?? 'Header Image',
-      caption: descriptiveImages[0].title
-   }
-
-}
 
 const Articles = (Props: { selectedCountry: string, onCountryChange: (country: string) => void }) =>
 {
@@ -73,38 +9,13 @@ const Articles = (Props: { selectedCountry: string, onCountryChange: (country: s
 
    const articlesToDisplay = useMemo(() =>
    {
-      const displayArticles: Article[] = articles.flatMap((post) =>
-      {
-         const contentHTML = new DOMParser().parseFromString(post.content ?? '', 'text/html');
-         const location = parseLocation(contentHTML);
-         if (!location  || !post.title)
-         {
-            return [];
-         }
-         return [{
-            slug: post.title.toLowerCase().trim().replace(/\s+/g, '-'),
-            title: post.title,
-            subtitle: post.subTitle,
-            country: location.country,
-            city: location.city,
-            content: post.content, //may not be necessary here
-            excerpt:parseExcerpt(contentHTML),
-            coordinates: {
-               latitude: 0, //deal with this later. 
-               longitude: 0
-            },
-            headerImage: parseHeaderImage(contentHTML),
-            // galleryImages?: Image[]
-         }]
-      });
-
       if (Props.selectedCountry !== '')
       {
-         return displayArticles.filter((article) => article.country === Props.selectedCountry)
+         return articles.filter((article) => article.country === Props.selectedCountry)
       }
       else
       {
-         return displayArticles;
+         return articles;
       }
    }, [Props.selectedCountry, articles]);
 
