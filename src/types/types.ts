@@ -2,6 +2,7 @@ import type { languageOptions } from "../constants/constants";
 
 export interface Image
 {
+   id: string;
    src: string;
    title: string;
    alt?: string;
@@ -17,8 +18,7 @@ export interface Article
    content: string;
    excerpt: string;
    coordinates: Coordinates | null,
-   galleryImages: Image[]
-}
+};
 
 export type FeedPost = {
    title?: string;

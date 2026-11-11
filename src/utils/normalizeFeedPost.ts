@@ -1,5 +1,6 @@
 const MAX_EXCERPT_WORDCOUNT = 50;
 const H6_HEADING = 'Location:';
+import type { Image } from '../types/types';
 
 export const parseLocation = (content: Document) =>
 {
@@ -41,33 +42,51 @@ export const parseExcerpt = (content: Document) =>
    return `${words.slice(0, MAX_EXCERPT_WORDCOUNT).join(' ')}...`;
 }
 
-export const parseImages = (content: Document) =>
+export const parseContent = (content: Document, slug: string) =>
 {
    const seen = new Set<string>();
-   const images = Array.from(content.querySelectorAll('img')).flatMap((img) =>
+   const images: Image[] = [];
+   for (const img of content.querySelectorAll('img'))
    {
       const src = img.getAttribute('src');
       if (src === null)
       {
-         return [];
+         continue;
       }
 
-      if (seen.has(src)) return [];
+      if (seen.has(src)) continue;
       seen.add(src);
 
+      const id = `${slug}:image:${images.length}`;
       const title = img.getAttribute('title');
       const alt = img.getAttribute('alt');
       const figure = img.closest('figure');
       const caption = figure?.querySelector('figcaption')?.textContent?.trim();
 
-      return [{
-         title: title?.trim() || '',
+      images.push({
+         id,
          src,
+         title: title?.trim() || '',
          alt: alt?.trim() || '',
          ... (caption ? { caption } : {}), //only add caption if it is present.
-      }];
+      });
 
-   });
-   return images;
-}
+      const placeholder = content.createElement('figure');
+      placeholder.dataset.mediaId = id;
+
+      if (figure)
+      {
+         figure.replaceWith(placeholder);
+      }
+      else
+      {
+         img.replaceWith(placeholder);
+      }
+   }
+
+   return {
+      content: content.body.innerHTML,
+      images
+   };
+};
 

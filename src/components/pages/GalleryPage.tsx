@@ -3,10 +3,9 @@ import { useAppSelector } from '../../hooks/customHooks';
 
 const GalleryPage = () => {
 
-   const articles = useAppSelector((state) => state.global.articles);
-   const images = articles.flatMap((article) => article.galleryImages ?? []);
+   const imagesById = useAppSelector((state) => state.global.imagesById);
    const [visibleCount, setVisibleCount] = useState(9);
-   const visibleImages = useMemo(() => images.slice(0, visibleCount), [visibleCount, images]);
+   const visibleImages = useMemo(() => Object.values(imagesById).slice(0, visibleCount), [imagesById, visibleCount]);
 
    return (
       <>
@@ -35,7 +34,7 @@ const GalleryPage = () => {
                />
             ))}
          </div>
-         {visibleCount < images.length && (
+         {visibleCount < Object.values(imagesById).length && (
             <button
                onClick={() => setVisibleCount((prevCount) => prevCount + 9)}
                style={{

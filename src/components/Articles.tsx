@@ -6,6 +6,7 @@ import { useAppSelector } from '../hooks/customHooks';
 const Articles = (Props: { selectedCountry: string, onCountryChange: (country: string) => void }) =>
 {
    const articles = useAppSelector((state) => state.global.articles);
+   const images = useAppSelector((state) => state.global.imagesById);
 
    const articlesToDisplay = useMemo(() =>
    {
@@ -26,6 +27,7 @@ const Articles = (Props: { selectedCountry: string, onCountryChange: (country: s
 
    const articleJSX = articlesToDisplay.map((article) =>
    {
+      const headerImage = images[`${article.slug}:image:0`];
       return (
          <div
             key={article.slug}
@@ -38,33 +40,35 @@ const Articles = (Props: { selectedCountry: string, onCountryChange: (country: s
                alignItems: 'flex-start', 
                gap: '2rem', margin: '1rem' }}
          >
-            <div style={{ flex: '1 1 0', minWidth: 0, margin: '1rem', textAlign: 'center' }}>
-               <figure style={{ width: '20rem', maxWidth: '100%', margin: '0 auto' }}>
-                  <div
-                     style={{
-                        width: '100%',
-                        aspectRatio: '1 / 1',
-                        overflow: 'hidden',
-                     }}
-                  >
-                     <img
-                        title={article.galleryImages[0].title}
-                        src={article.galleryImages[0].src}
-                        alt={article.galleryImages[0].alt ?? article.galleryImages[0].title}
-                        loading="lazy"
+            { headerImage && 
+               <div style={{ flex: '1 1 0', minWidth: 0, margin: '1rem', textAlign: 'center' }}>
+                  <figure style={{ width: '20rem', maxWidth: '100%', margin: '0 auto' }}>
+                     <div
                         style={{
                            width: '100%',
-                           height: '100%',
-                           objectFit: 'cover',
-                           objectPosition: 'center'
+                           aspectRatio: '1 / 1',
+                           overflow: 'hidden',
                         }}
-                     />
-                  </div>
-                  <figcaption style={{ textAlign: 'center' }}>
-                     {article.galleryImages[0].caption ?? article.galleryImages[0].title}
-                  </figcaption>                  
-               </figure>
-            </div>
+                     >
+                        <img
+                           title={headerImage.title}
+                           src={headerImage.src}
+                           alt={headerImage.alt ?? headerImage.title}
+                           loading="lazy"
+                           style={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'cover',
+                              objectPosition: 'center'
+                           }}
+                        />
+                     </div>
+                     <figcaption style={{ textAlign: 'center' }}>
+                        {headerImage.caption ?? headerImage.title}
+                     </figcaption>                  
+                  </figure>
+               </div>
+            }
             <div style={{ flex: '3 1 0', minWidth: 0, margin: 0, padding: '2rem', textAlign: 'left' }}>
                <Link to={`/articles/${article.slug}`}>
                   <h2>{article.title}</h2>

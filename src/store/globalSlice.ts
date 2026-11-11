@@ -1,8 +1,7 @@
 import { createSlice, configureStore, type PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
-import DOMPurify from 'dompurify';
 import { languageOptions } from '../constants/constants';
-import type { Article, ArticleLocation, Coordinates, FeedPost, GeoResult, Language } from '../types/types';
-import { parseExcerpt, parseImages, parseLocation } from '../utils/normalizeFeedPost';
+import type { Article, ArticleLocation, Coordinates, FeedPost, GeoResult, Language, Image } from '../types/types';
+import { parseContent, parseExcerpt, parseLocation } from '../utils/normalizeFeedPost';
 
 type LoadingStatus = "idle" | "loading" | "succeeded" | "failed";
 
@@ -13,6 +12,7 @@ interface GlobalState {
    articlesError: string | null;
    coordinatesStatus: LoadingStatus;
    coordinatesError: string | null;
+   imagesById: Record<string, Image>;
 }
 
 const initialState: GlobalState = {
@@ -21,10 +21,11 @@ const initialState: GlobalState = {
    articlesStatus: "idle",
    articlesError: null,
    coordinatesStatus: "idle",
-   coordinatesError: null
+   coordinatesError: null,
+   imagesById: {}
 };
 
-export const fetchFeedPosts = createAsyncThunk<Article[]>(
+export const fetchFeedPosts = createAsyncThunk<{ articles: Article[], imagesById: Record<string, Image> }>(
    'global/fetchFeedPosts',
    async () =>
    {
@@ -34,7 +35,8 @@ export const fetchFeedPosts = createAsyncThunk<Article[]>(
          throw new Error('Failed to fetch feed posts.');
       }
       const posts: FeedPost[] = await response.json();
-      const normalizedData = posts.flatMap((post) =>
+      const imagesById: Image[] = [];
+      const normalizedPostData = posts.flatMap((post) =>
       {
          const contentHTML = new DOMParser().parseFromString(post.content ?? '', 'text/html');
          const location = parseLocation(contentHTML);
@@ -42,19 +44,24 @@ export const fetchFeedPosts = createAsyncThunk<Article[]>(
          {
             return [];
          }
-         const images = parseImages(contentHTML);
+         const slug = post.title.toLowerCase().trim().replace(/\s+/g, '-');
+         const { images, content } = parseContent(contentHTML, slug);
+         imagesById.push(...images);
          return [{
-            slug: post.title.toLowerCase().trim().replace(/\s+/g, '-'),
+            slug,
             title: post.title,
             subtitle: post.subTitle,
             location: { country: location.country, city: location.city },
-            content: DOMPurify.sanitize(post.content), //may not be necessary here
+            content: content,
             excerpt:parseExcerpt(contentHTML),
             coordinates: null,
-            galleryImages: images
          }]
       });
-      return normalizedData;
+
+      return {
+         articles: normalizedPostData,
+         imagesById: Object.fromEntries(imagesById.map((image) => [image.id, image])),
+      }
    }
 );
 
@@ -90,7 +97,8 @@ const globalSlice = createSlice({
          })
          .addCase(fetchFeedPosts.fulfilled, (state, action) => {
             state.articlesStatus = "succeeded";
-            state.articles = action.payload;
+            state.articles = action.payload.articles;
+            state.imagesById = action.payload.imagesById;
          })
          .addCase(fetchFeedPosts.rejected, (state, action) => {
             state.articlesStatus = "failed";
@@ -107,7 +115,6 @@ const globalSlice = createSlice({
                   result.coordinates,
                ])
             );
-            console.dir(coordinatesByLocation);
 
             state.articles.forEach((article) => {
                const key =
