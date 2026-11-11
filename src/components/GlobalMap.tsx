@@ -9,6 +9,9 @@ import { fetchCoordinates } from '../store/globalSlice';
 
 setWorkerUrl(workerUrl);
 
+const DEFAULT_MAP_CENTER: [number, number] = [-3, 30];
+const DEFAULT_MAP_ZOOM = 0;
+
 const GlobalMap = (Props: { selectedCountry: string | null }) => {
    const mapContainer = useRef<HTMLDivElement>(null);
    const mapRef = useRef<Map | null>(null);
@@ -20,20 +23,36 @@ const GlobalMap = (Props: { selectedCountry: string | null }) => {
 
    useEffect(() =>
    {
-      if (!mapContainer.current) return;
+      const container = mapContainer.current;
+      if (!container) return;
 
       const map = new Map({
-         container: mapContainer.current,
-         style: 'https://demotiles.maplibre.org/style.json', // style URL
-         center: [-3.7, 40.4], // starting position [lng, lat]
-         zoom: -1 , // starting zoom
+         container: container,
+         style: 'https://demotiles.maplibre.org/style.json',
+         center: DEFAULT_MAP_CENTER,
+         zoom: DEFAULT_MAP_ZOOM,
          rollEnabled: true,
          renderWorldCopies: false,
+         attributionControl: {
+            compact: false,
+            customAttribution: [
+               '<a href="https://maplibre.org/" target="_blank" rel="noopener noreferrer">MapLibre</a>',
+               'Geocoding: &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a>',
+            ],
+         },
       });
 
       mapRef.current = map;
 
-      // Add zoom and rotation controls to the map.
+      map.once('load', () => {
+         map.setPaintProperty('background', 'background-color', '#F2E6D8');
+         map.setPaintProperty('countries-fill', 'fill-color', '#68A69B');
+         map.setPaintProperty('countries-boundary', 'line-color', '#2D6673');
+         map.setPaintProperty('countries-label', 'text-color', '#2D6673');
+         map.setPaintProperty('countries-label', 'text-halo-color', '#F2E6D8');
+         map.setPaintProperty('geolines-label', 'text-color', '#D96A29');
+      });
+
       map.addControl(new maplibregl.NavigationControl({
          visualizePitch: true,
          visualizeRoll: true,
@@ -68,7 +87,7 @@ const GlobalMap = (Props: { selectedCountry: string | null }) => {
             .setDOMContent(popupContent);
 
          return [
-            new maplibregl.Marker()
+            new maplibregl.Marker({ color: '#D93232' })
                .setLngLat([
                   article.coordinates.longitude,
                   article.coordinates.latitude,
@@ -78,7 +97,18 @@ const GlobalMap = (Props: { selectedCountry: string | null }) => {
          ];
       });
 
+      map.once('idle', () =>
+      {
+         if (container) {
+            container.style.opacity = '1';
+         }
+      });
+
       return () => {
+         if (container)
+         {
+            container.style.opacity = '0';
+         }
          markers.forEach((marker) => marker.remove());
          mapRef.current = null;
          map.remove();
@@ -92,46 +122,35 @@ const GlobalMap = (Props: { selectedCountry: string | null }) => {
 
       if (!Props.selectedCountry || Props.selectedCountry === null)
       {
-         map.fitBounds([[-180, -85.051129], [180, 85.051129]],
-            { padding: 0, duration: 1000 });
-
-         //          map.flyTo({
-         //   center: [-3.7, 40.4],
-         //   zoom: -1,
-         //   duration: 1000,
-         // })
-
-         //             map.once('moveend', () => {
-         //   console.log('zoom:', map.getZoom(), 'bounds:', map.getBounds().toArray())
-         // })
-
+         map.flyTo({
+            center: DEFAULT_MAP_CENTER,
+            zoom: DEFAULT_MAP_ZOOM,
+            duration: 1000,
+         });
          return;
       }
-   
-      const locations = articles.filter(
-         (article) => article.location.country === Props.selectedCountry
-      )
-   
-      if (locations.length === 0) return;
-   
-      if (locations.length > 0)
+
+      const coordinates = articles
+         .flatMap((article) => (article.location.country === Props.selectedCountry && article.coordinates !== null ? [article.coordinates] : []));
+      
+      if (coordinates.length === 0) return;
+
+      if (coordinates.length === 1)
       {
-         const { longitude, latitude } = locations[0].coordinates ?? { latitude: 0, longitude: 0};
+         const { longitude, latitude } = coordinates[0];
          map.flyTo({
             center: [longitude, latitude],
             zoom: 6,
             duration: 1000,
-         })
+         });
+         return;
       }
 
       const bounds = new maplibregl.LngLatBounds();
-      locations.forEach(({ coordinates }) =>
+      coordinates.forEach(({ longitude, latitude }) =>
       {
-         if (coordinates !== null)
-         {
-            bounds.extend([coordinates.longitude, coordinates.latitude]);
-         }
-      })
+         bounds.extend([longitude, latitude]);
+      });
 
       map.fitBounds(bounds, { padding: 40, maxZoom: 6, duration: 1000 });
    }, [Props.selectedCountry, articles]);
@@ -147,18 +166,10 @@ const GlobalMap = (Props: { selectedCountry: string | null }) => {
    }, [articles, dispatch, articlesStatus, coordinatesStatus])
       
    return (
-      <>
-         <div 
-            ref={mapContainer}
-            style={{ width: '100%', height: '400px' }}
-         />
-         <p>
-            Geocoding: ©
-            <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">
-               OpenStreetMap contributors
-            </a>
-         </p>
-      </>
+      <div
+         ref={mapContainer}
+         style={{ width: '100%', height: '400px', opacity: 0, transition: 'opacity 150ms ease' }}
+      />
    );
 };
 
