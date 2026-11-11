@@ -1,4 +1,4 @@
-const About = () => {
+const AboutPage = () => {
    return (
       <div style={{ textAlign: 'left' }}>
 
@@ -33,4 +33,4 @@ const About = () => {
    )
 };
 
-export default About;
+export default AboutPage;

@@ -1,9 +1,9 @@
 import { useState } from "react";
-import Articles from "./Articles"
-import GlobalMap from "./GlobalMap"
+import Articles from "../Articles"
+import GlobalMap from "../GlobalMap"
 
 
-const Home = () => {
+const HomePage = () => {
    const [selectedCountry, setSelectedCountry] = useState<string>('');
    const handleCountryChange = (country: string) =>
    {
@@ -18,4 +18,4 @@ const Home = () => {
    )
 };
 
-export default Home;
+export default HomePage;

@@ -1,4 +1,4 @@
-const Contact = () => {
+const ContactPage = () => {
    return (
       <div>
          <p style={{textAlign: 'left'}}>Questions, comments, or feedback are welcome! Note that no abuse will be tolerated. After all, this is <u>my</u> blog.</p>
@@ -27,4 +27,4 @@ const Contact = () => {
    )
 };
 
-export default Contact;
+export default ContactPage;

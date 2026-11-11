@@ -1,14 +1,14 @@
 import { Route, Routes } from 'react-router'
 import './App.css'
 import NavBar from './components/NavBar'
-import About from './components/About'
-import Contact from './components/Contact'
-import Article from './components/Article'
+import AboutPage from './components/pages/AboutPage'
+import ContactPage from './components/pages/ContactPage'
+import ArticlePage from './components/pages/ArticlePage'
 import Footer from './components/Footer'
-import Articles from './components/Articles'
-import Home from './components/Home'
-import Gallery from './components/Gallery'
-import SinglePage from './components/SinglePage'
+import HomePage from './components/pages/HomePage'
+import GalleryPage from './components/pages/GalleryPage'
+import SinglePage from './components/pages/SinglePage'
+import ArticlesPage from './components/pages/ArticlesPage'
 
 function App() {
 
@@ -16,12 +16,12 @@ function App() {
       <>
          <NavBar />
          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<SinglePage title="About" children={<About />} />} />
-            <Route path="/contact" element={<SinglePage title="Contact" children={<Contact />} />} />
-            <Route path="/articles" element={<SinglePage title="Articles" children={<Articles />} />} />
-            <Route path="/articles/:slug" element={<Article />} />
-            <Route path="/gallery" element={<SinglePage title="Gallery" children={<Gallery />} />} />
+            <Route path="/" element={<HomePage />} />
+            <Route path="/about" element={<SinglePage title="About" children={<AboutPage />} />} />
+            <Route path="/contact" element={<SinglePage title="Contact" children={<ContactPage />} />} />
+            <Route path="/articles" element={<SinglePage title="Articles" children={<ArticlesPage />} />} />
+            <Route path="/articles/:slug" element={<ArticlePage />} />
+            <Route path="/gallery" element={<SinglePage title="Gallery" children={<GalleryPage />} />} />
          </Routes>
          <Footer />
       </>

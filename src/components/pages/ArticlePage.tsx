@@ -1,8 +1,8 @@
-import type { Article } from "../types/types";
-import { articles } from "../assets/articles/articles";
+import type { Article } from "../../types/types";
+import { articles } from "../../assets/articles/articles";
 import { useParams } from "react-router";
 
-const Article = () => {
+const ArticlePage = () => {
    const { slug } = useParams<{ slug: string }>();
    const article = articles.find((article: Article) => article.slug === slug);
 
@@ -49,4 +49,4 @@ const Article = () => {
    );
 };
 
-export default Article;
+export default ArticlePage;

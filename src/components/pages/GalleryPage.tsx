@@ -1,6 +1,6 @@
 import {useMemo, useState} from 'react';
 const imageFiles = import.meta.glob<string>(
-   '../assets/images/*.{png,jpg,jpeg,webp,avif}',
+   '../../assets/images/*.{png,jpg,jpeg,webp,avif}',
    {
       eager: true,
       query: '?url',
@@ -17,7 +17,7 @@ const images = Object.entries(imageFiles).map(([path, src]) => ({
       .replace(/[-_]/g, ' ') ?? 'Gallery Image',
 }))
 
-const Gallery = () => {
+const GalleryPage = () => {
 
    const [visibleCount, setVisibleCount] = useState(9);
    const visibleImages = useMemo(() => images.slice(0, visibleCount), [visibleCount]);
@@ -64,4 +64,4 @@ const Gallery = () => {
    )
 };
 
-export default Gallery;
+export default GalleryPage;
