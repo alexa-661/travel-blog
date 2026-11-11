@@ -1,4 +1,6 @@
-import type { Article } from "../../types/types";
+import type { Article } from '../../types/types'
+import trailImage from '../images/trail-view-sheeps-creek-kluane-01.jpg'
+import halifaxImage from '../images/halifax-smoky-rainbow-02.jpg'
 
 export const articles: Article[] = [
   {
@@ -14,7 +16,7 @@ export const articles: Article[] = [
       longitude: -135.0568
     },
     headerImage: {
-      src: '/images/trail-view-sheeps-creek-kluane-01.jpg',
+      src: trailImage,
       alt: 'A view of Kluane National Park from the top of Sheep\'s Creek hike.',
       caption: 'It just keeps going up.'
     }
@@ -32,7 +34,7 @@ export const articles: Article[] = [
       longitude: -63.5824
     },
     headerImage: {
-      src: '/images/halifax-smoky-rainbow-02.jpg',
+      src: halifaxImage,
       alt: 'A view of a rainbow ring around the sun.',
       caption: 'I hope this photo didn\'t damage my camera sensor too much.'
     }

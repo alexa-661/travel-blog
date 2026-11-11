@@ -44,10 +44,6 @@
     --shadow:
       rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
   }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
 }
 
 #root {
@@ -92,7 +88,7 @@ h2 {
   }
 }
 p {
-  margin: 0;
+  margin: 1rem 0;
 }
 
 code,
@@ -108,4 +104,10 @@ code {
   line-height: 135%;
   padding: 4px 8px;
   background: var(--code-bg);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }

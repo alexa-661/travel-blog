@@ -80,7 +80,6 @@ const GlobalMap = () => {
             ref={mapContainer}
             style={{ width: '100%', height: '400px' }}
          />
-         <Articles />
       </>
   );
 };

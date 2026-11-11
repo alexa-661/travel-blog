@@ -16,6 +16,9 @@ const NavBar = () => {
          <li style={{ marginRight: '1rem' }}>
             <Link to="/contact" style={{ textDecoration: 'none' }}>Contact</Link>
          </li>
+          <li style={{ marginRight: '1rem' }}>
+            <Link to="/gallery" style={{ textDecoration: 'none' }}>Gallery</Link>
+         </li>
       </ul>
     </nav>
   );
