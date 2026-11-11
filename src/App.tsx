@@ -10,8 +10,10 @@ import GalleryPage from './components/pages/GalleryPage'
 import SinglePage from './components/pages/SinglePage'
 import ArticlesPage from './components/pages/ArticlesPage'
 import { useAppDispatch } from './hooks/customHooks'
-import { fetchFeedPosts } from './store/globalSlice'
+import { fetchFeedPosts, setSelectedLanguage } from './store/globalSlice'
 import { useEffect } from 'react'
+import { languageOptions, STORAGE_KEY } from './constants/constants'
+import type { Language } from './types/types'
 
 function App() {
 
@@ -19,6 +21,18 @@ function App() {
 
    useEffect(() => {
       dispatch(fetchFeedPosts());
+      const savedLanguage: string | null = localStorage.getItem(STORAGE_KEY);
+      const initialLanguage = (): Language =>
+      {
+         if (savedLanguage === null)
+         {
+            return languageOptions[0];
+         }
+         return languageOptions.find((language) => language === savedLanguage) ?? languageOptions[0];
+
+      }
+      dispatch(setSelectedLanguage(initialLanguage()));
+
    }, [dispatch]);
 
    return (

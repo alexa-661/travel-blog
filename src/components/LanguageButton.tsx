@@ -1,5 +1,5 @@
 import { setSelectedLanguage } from "../store/globalSlice";
-import { languageOptions } from "../constants/constants";
+import { languageOptions, STORAGE_KEY } from "../constants/constants";
 import { useAppDispatch, useAppSelector } from "../hooks/customHooks";
 
 const LanguageButton = () =>
@@ -10,7 +10,10 @@ const LanguageButton = () =>
 
    const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) =>
    {
-      dispatch(setSelectedLanguage(e.target.value));
+      const language = languageOptions.find((option) => option === e.target.value);
+      if (!language) return;
+      dispatch(setSelectedLanguage(language));
+      localStorage.setItem(STORAGE_KEY, language);
    };
 
    return (
