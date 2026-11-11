@@ -11,7 +11,7 @@ const Articles = (Props: { selectedCountry: string, onCountryChange: (country: s
    {
       if (Props.selectedCountry !== '')
       {
-         return articles.filter((article) => article.country === Props.selectedCountry)
+         return articles.filter((article) => article.location.country === Props.selectedCountry);
       }
       else
       {
@@ -67,7 +67,7 @@ const Articles = (Props: { selectedCountry: string, onCountryChange: (country: s
                   <h2>{article.title}</h2>
                </Link>
                <h3>{article.subtitle}</h3>
-               <p>{article.country}, {article.city}</p>
+               <p>{article.location.country}, {article.location.city}</p>
                <p>{article.excerpt}</p>
                <button>Read More</button>
             </div>

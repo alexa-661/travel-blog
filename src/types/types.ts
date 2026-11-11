@@ -12,14 +12,10 @@ export interface Article
    slug: string;
    title: string;
    subtitle?: string;
-   country: string;
-   city: string;
+   location: ArticleLocation;
    content: string;
    excerpt: string;
-   coordinates: {
-      latitude: number;
-      longitude: number;
-   },
+   coordinates: Coordinates | null,
    headerImage: Image,
    galleryImages?: Image[]
 }
@@ -33,3 +29,15 @@ export type FeedPost = {
 };
 
 export type Language = (typeof languageOptions)[number]; //the type of any element in this array. 
+
+export type Coordinates = {
+   latitude: number;
+   longitude: number;
+}
+
+export type ArticleLocation = {
+   city: string;
+   country: string;
+}
+
+export type GeoResult = ArticleLocation & { coordinates: Coordinates };

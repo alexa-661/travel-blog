@@ -4,7 +4,7 @@ import { useAppSelector } from '../hooks/customHooks';
 const CountryFilter = (Props: { selectedCountry: string, onCountryChange: (country: string) => void }) => {
    
    const articles = useAppSelector((state) => state.global.articles);
-   const countryOptions = useMemo(() => new Set(articles.map((article) => article.country)), [articles]);
+   const countryOptions = useMemo(() => new Set(articles.map((article) => article.location.country)), [articles]);
 
    return (
       <form>
@@ -16,7 +16,7 @@ const CountryFilter = (Props: { selectedCountry: string, onCountryChange: (count
                Props.onCountryChange(e.target.value);
             }}
          >
-            <option value="">All Countries</option>
+            <option key="" value="">All Countries</option>
             {Array.from(countryOptions).map((country) => (
                <option key={country} value={country}>
                   {country}
