@@ -4,27 +4,47 @@ import Parser from 'rss-parser'
 
 const app = express();
 const parser = new Parser();
-const GEOCODE_MAX_REQUEST_TIME = 1000; //once every 1000ms
+const GEOCODE_MAX_REQUEST_TIME_MS = 1000;
+const ARTICLES_CACHE_TTL_MS = 10 * 60 * 1000;
+const articlesCache = { articles: [], fetchedAt: 0 };
 
 //Substack RSS Feed
 app.get('/api/posts', async (_req, res) => {
-  try {
-    const feed = await parser.parseURL(process.env.SUBSTACK_FEED_URL)
+   const feedUrl = process.env.SUBSTACK_FEED_URL;
+   const cachedFeed = articlesCache.articles.length ? articlesCache : null;
 
-    res.json(
-      feed.items.map((item) => ({
-        title: item.title,
-        subTitle: item.description,
-        url: item.link,
-        creator: item.creator,
-        publishedAt: item.pubDate,
-        content: item['content:encoded'],
-      })),
-    )
-  } catch (error) {
-    console.error(error)
-    res.status(500).json({ error: 'Could not load the Substack feed.' })
-  }
+   if (cachedFeed && Date.now() - cachedFeed.fetchedAt < ARTICLES_CACHE_TTL_MS)
+   {
+      console.log("Return cached RSS feed");
+      return res.json(cachedFeed.articles);
+   }
+
+   try {
+      const feed = await parser.parseURL(feedUrl);
+      const articles = feed.items.map((item) => ({
+         title: item.title,
+         subTitle: item.description,
+         url: item.link,
+         creator: item.creator,
+         publishedAt: item.pubDate,
+         content: item['content:encoded'],
+      }));
+
+      console.log("Fetched new feed");
+
+      articlesCache.articles = articles;
+      articlesCache.fetchedAt = Date.now();
+      return res.json(articles);
+   }
+   catch (error)
+   {
+      console.error(error);
+      if (cachedFeed)
+      {
+         return res.json(cachedFeed.articles);
+      }
+      return res.status(500).json({ error: 'Could not load the Substack feed.' });
+   }
 })
 
 app.listen(3001, () => {
@@ -107,7 +127,7 @@ const processNextGeocode = async () =>
 
    if (geocodeQueue.length > 0 && queueTimerId === null)
    {
-      queueTimerId = setTimeout(() => { queueTimerId = null; processNextGeocode()}, GEOCODE_MAX_REQUEST_TIME);
+      queueTimerId = setTimeout(() => { queueTimerId = null; processNextGeocode()}, GEOCODE_MAX_REQUEST_TIME_MS);
    }
 
 }
