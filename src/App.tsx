@@ -1,7 +1,6 @@
 import { Route, Routes } from 'react-router'
 import './App.css'
 import NavBar from './components/NavBar'
-import AboutPage from './components/pages/AboutPage'
 import ContactPage from './components/pages/ContactPage'
 import ArticlePage from './components/pages/ArticlePage'
 import Footer from './components/Footer'
@@ -38,14 +37,15 @@ function App() {
    return (
       <>
          <NavBar />
-         <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/about" element={<SinglePage title="About" children={<AboutPage />} />} />
-            <Route path="/contact" element={<SinglePage title="Contact" children={<ContactPage />} />} />
-            <Route path="/articles" element={<SinglePage title="Articles" children={<ArticlesPage />} />} />
-            <Route path="/articles/:slug" element={<ArticlePage />} />
-            <Route path="/gallery" element={<SinglePage title="Gallery" children={<GalleryPage />} />} />
-         </Routes>
+         <main className="app-content">
+            <Routes>
+               <Route path="/" element={<HomePage />} />
+               <Route path="/contact" element={<SinglePage title="Contact" children={<ContactPage />} />} />
+               <Route path="/articles" element={<SinglePage title="Articles" children={<ArticlesPage />} />} />
+               <Route path="/articles/:slug" element={<ArticlePage />} />
+               <Route path="/gallery" element={<SinglePage title="Gallery" children={<GalleryPage />} />} />
+            </Routes>
+         </main>
          <Footer />
       </>
    )

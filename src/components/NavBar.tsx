@@ -13,9 +13,6 @@ const NavBar = () => {
                   <Link to="/articles" style={{ textDecoration: 'none' }}>Articles</Link>
                </li>
                <li style={{ marginRight: '1rem' }}>
-                  <Link to="/about" style={{ textDecoration: 'none' }}>About</Link>
-               </li>
-               <li style={{ marginRight: '1rem' }}>
                   <Link to="/contact" style={{ textDecoration: 'none' }}>Contact</Link>
                </li>
                <li style={{ marginRight: '1rem' }}>
