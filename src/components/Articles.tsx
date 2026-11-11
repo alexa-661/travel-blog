@@ -1,10 +1,18 @@
 import { Link } from 'react-router';
 import { articles } from '../assets/articles/articles';
+import CountryFilter from './CountryFilter';
+import { useState } from 'react';
 
 const Articles = () =>
 {
+   const [articlesToDisplay, setArticlesToDisplay] = useState(articles);
 
-   const articleJSX = articles.map((article) =>
+   const handleCountryChange = (country: string) =>
+   {
+      setArticlesToDisplay(country ? articles.filter((article) => article.country === country) : articles);
+   }
+
+   const articleJSX = articlesToDisplay.map((article) =>
    {
       return (
          <div
@@ -55,8 +63,12 @@ const Articles = () =>
       );
    });
 
-   return <section className="articles">{articleJSX}</section>;
-   
+   return (
+   <div style={{ margin: '1rem' }}>
+      <CountryFilter onCountryChange={handleCountryChange} />
+      <section className="articles">{articleJSX}</section>;
+   </div>
+   )
 };
 
 export default Articles;

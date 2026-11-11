@@ -5,7 +5,6 @@ import { useEffect, useRef } from 'react';
 import * as maplibregl from 'maplibre-gl';
 import { useNavigate } from 'react-router';
 import { articles } from '../assets/articles/articles';
-import Articles from './Articles';
 
 setWorkerUrl(workerUrl);
 
