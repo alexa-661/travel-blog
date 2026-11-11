@@ -8,6 +8,8 @@ const GEOCODE_MAX_REQUEST_TIME_MS = 1000;
 const ARTICLES_CACHE_TTL_MS = 10 * 60 * 1000;
 const articlesCache = { articles: [], fetchedAt: 0 };
 
+app.use(express.json({ limit: '10kb' })); //limit JSON requests
+
 //Substack RSS Feed
 app.get('/api/posts', async (_req, res) => {
    const feedUrl = process.env.SUBSTACK_FEED_URL;
@@ -52,7 +54,6 @@ app.listen(3001, () => {
 })
 
 //Open Street Map Nominatim
-app.use(express.json({ limit: '10kb' })); //limit JSON requests
 
 app.post('/api/geocode', async (req, res) =>
 {
@@ -171,4 +172,14 @@ const requestNominatim = async (city, country) =>
 
    return { latitude, longitude };
 };
+
+// contact form submission endpoint
+app.post('/api/contact', async (_req, res) =>
+{
+   // const { name, email, message } = req.body;
+   console.log(`Received contact form submission data.`);
+
+   //eventually put in an email forwarding service here, but for now just return a success response.
+   res.status(200).json({ message: 'Contact form submitted successfully.' });
+});
 
