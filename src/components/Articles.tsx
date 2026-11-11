@@ -14,12 +14,12 @@ const Articles = (Props: { selectedCountry: string, onCountryChange: (country: s
             key={article.slug}
             className="article"
             style={{ display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            width: '100%',
-            boxSizing: 'border-box',
-            alignItems: 'flex-start', 
-            gap: '2rem', margin: '1rem' }}
+               flexDirection: 'row',
+               justifyContent: 'space-between',
+               width: '100%',
+               boxSizing: 'border-box',
+               alignItems: 'flex-start', 
+               gap: '2rem', margin: '1rem' }}
          >
             <div style={{ flex: '1 1 0', minWidth: 0, margin: '1rem', textAlign: 'center' }}>
                <figure style={{ width: '20rem', maxWidth: '100%', margin: '0 auto' }}>
@@ -42,12 +42,12 @@ const Articles = (Props: { selectedCountry: string, onCountryChange: (country: s
                         }}
                      />
                   </div>
-               <figcaption style={{ textAlign: 'center' }}>{article.headerImage.caption}</figcaption>                  
+                  <figcaption style={{ textAlign: 'center' }}>{article.headerImage.caption}</figcaption>                  
                </figure>
             </div>
             <div style={{ flex: '3 1 0', minWidth: 0, margin: 0, padding: '2rem', textAlign: 'left' }}>
                <Link to={`/articles/${article.slug}`}>
-                     <h2>{article.title}</h2>
+                  <h2>{article.title}</h2>
                </Link>
                <h3>{article.subtitle}</h3>
                <p>{article.country}, {article.city}</p>
@@ -59,10 +59,10 @@ const Articles = (Props: { selectedCountry: string, onCountryChange: (country: s
    });
 
    return (
-   <div style={{ margin: '1rem' }}>
-      <CountryFilter selectedCountry={Props.selectedCountry} onCountryChange={Props.onCountryChange} />
-      <section className="articles">{articleJSX}</section>;
-   </div>
+      <div style={{ margin: '1rem' }}>
+         <CountryFilter selectedCountry={Props.selectedCountry} onCountryChange={Props.onCountryChange} />
+         <section className="articles">{articleJSX}</section>;
+      </div>
    )
 };
 

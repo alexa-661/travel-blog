@@ -12,20 +12,20 @@ import SinglePage from './components/SinglePage'
 
 function App() {
 
-  return (
-    <>
-      <NavBar />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<SinglePage title="About" children={<About />} />} />
-          <Route path="/contact" element={<SinglePage title="Contact" children={<Contact />} />} />
-          <Route path="/articles" element={<SinglePage title="Articles" children={<Articles />} />} />
-          <Route path="/articles/:slug" element={<Article />} />
-          <Route path="/gallery" element={<SinglePage title="Gallery" children={<Gallery />} />} />
-        </Routes>
-      <Footer />
-    </>
-  )
+   return (
+      <>
+         <NavBar />
+         <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/about" element={<SinglePage title="About" children={<About />} />} />
+            <Route path="/contact" element={<SinglePage title="Contact" children={<Contact />} />} />
+            <Route path="/articles" element={<SinglePage title="Articles" children={<Articles />} />} />
+            <Route path="/articles/:slug" element={<Article />} />
+            <Route path="/gallery" element={<SinglePage title="Gallery" children={<Gallery />} />} />
+         </Routes>
+         <Footer />
+      </>
+   )
 }
 
 export default App

@@ -6,11 +6,11 @@ import { BrowserRouter } from "react-router";
 import ThemeProvider from './components/ThemeProvider.tsx';
 
 createRoot(document.getElementById('root')!).render(
-      <StrictMode>
-         <ThemeProvider>
-            <BrowserRouter>
-               <App />
-            </BrowserRouter>
-         </ThemeProvider>
-      </StrictMode>
+   <StrictMode>
+      <ThemeProvider>
+         <BrowserRouter>
+            <App />
+         </BrowserRouter>
+      </ThemeProvider>
+   </StrictMode>
 )

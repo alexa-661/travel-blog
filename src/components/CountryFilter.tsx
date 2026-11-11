@@ -14,14 +14,14 @@ const CountryFilter = (Props: { selectedCountry: string, onCountryChange: (count
             onChange={(e) => {
                Props.onCountryChange(e.target.value);
             }}
-            >
-               <option value="">All Countries</option>
-               {Array.from(countryOptions).map((country) => (
-                  <option key={country} value={country}>
-                     {country}
-                  </option>
-               ))}
-            </select>
+         >
+            <option value="">All Countries</option>
+            {Array.from(countryOptions).map((country) => (
+               <option key={country} value={country}>
+                  {country}
+               </option>
+            ))}
+         </select>
       </form>
       
    );

@@ -3,13 +3,13 @@ const Contact = () => {
       <div>
          <p style={{textAlign: 'left'}}>Questions, comments, or feedback are welcome! Note that no abuse will be tolerated. After all, this is <u>my</u> blog.</p>
          <form style={{
-               display: 'grid',
-               gridTemplateColumns: '7rem minmax(0, 1fr)',
-               gap: '1rem',
-               maxWidth: '40rem',
-               textAlign: 'left',
-               margin: '0 auto',
-            }}
+            display: 'grid',
+            gridTemplateColumns: '7rem minmax(0, 1fr)',
+            gap: '1rem',
+            maxWidth: '40rem',
+            textAlign: 'left',
+            margin: '0 auto',
+         }}
          >
             <label htmlFor="name" style={{marginRight: '1rem'}}>Name:</label>
             <input type="text" id="name" name="name" required />

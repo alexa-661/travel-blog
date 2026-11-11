@@ -28,7 +28,7 @@ const GlobalMap = (Props: { selectedCountry: string | null }) => {
 
       mapRef.current = map;
 
-            // Add zoom and rotation controls to the map.
+      // Add zoom and rotation controls to the map.
       map.addControl(new maplibregl.NavigationControl({
          visualizePitch: true,
          visualizeRoll: true,
@@ -94,42 +94,42 @@ const GlobalMap = (Props: { selectedCountry: string | null }) => {
          //   console.log('zoom:', map.getZoom(), 'bounds:', map.getBounds().toArray())
          // })
 
-        return;
+         return;
       }
    
       const locations = articles.filter(
-        (article) => article.country === Props.selectedCountry
+         (article) => article.country === Props.selectedCountry
       )
    
       if (locations.length === 0) return;
    
       if (locations.length > 0)
       {
-        const { longitude, latitude } = locations[0].coordinates
-        map.flyTo({
-          center: [longitude, latitude],
-          zoom: 6,
-          duration: 1000,
-        })
+         const { longitude, latitude } = locations[0].coordinates
+         map.flyTo({
+            center: [longitude, latitude],
+            zoom: 6,
+            duration: 1000,
+         })
       }
 
-   const bounds = new maplibregl.LngLatBounds();
-   locations.forEach(({ coordinates }) =>
-   {
-      bounds.extend([coordinates.longitude, coordinates.latitude]);
-   })
+      const bounds = new maplibregl.LngLatBounds();
+      locations.forEach(({ coordinates }) =>
+      {
+         bounds.extend([coordinates.longitude, coordinates.latitude]);
+      })
 
-   map.fitBounds(bounds, { padding: 40, maxZoom: 6, duration: 1000 });
-}, [Props.selectedCountry]);
+      map.fitBounds(bounds, { padding: 40, maxZoom: 6, duration: 1000 });
+   }, [Props.selectedCountry]);
       
-  return (
+   return (
       <>
          <div 
             ref={mapContainer}
             style={{ width: '100%', height: '400px' }}
          />
       </>
-  );
+   );
 };
 
 export default GlobalMap;
