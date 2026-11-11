@@ -48,8 +48,9 @@ const Articles = (Props: { selectedCountry: string, onCountryChange: (country: s
                      }}
                   >
                      <img
-                        src={article.headerImage.src}
-                        alt={article.headerImage.alt}
+                        title={article.galleryImages[0].title}
+                        src={article.galleryImages[0].src}
+                        alt={article.galleryImages[0].alt ?? article.galleryImages[0].title}
                         loading="lazy"
                         style={{
                            width: '100%',
@@ -59,7 +60,9 @@ const Articles = (Props: { selectedCountry: string, onCountryChange: (country: s
                         }}
                      />
                   </div>
-                  <figcaption style={{ textAlign: 'center' }}>{article.headerImage.caption}</figcaption>                  
+                  <figcaption style={{ textAlign: 'center' }}>
+                     {article.galleryImages[0].caption ?? article.galleryImages[0].title}
+                  </figcaption>                  
                </figure>
             </div>
             <div style={{ flex: '3 1 0', minWidth: 0, margin: 0, padding: '2rem', textAlign: 'left' }}>

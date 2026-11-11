@@ -1,26 +1,12 @@
 import {useMemo, useState} from 'react';
-const imageFiles = import.meta.glob<string>(
-   '../../assets/images/*.{png,jpg,jpeg,webp,avif}',
-   {
-      eager: true,
-      query: '?url',
-      import: 'default',
-   },
-)
-
-const images = Object.entries(imageFiles).map(([path, src]) => ({
-   src,
-   alt: path
-      .split('/')
-      .pop()
-      ?.replace(/\.[^.]+$/, '')
-      .replace(/[-_]/g, ' ') ?? 'Gallery Image',
-}))
+import { useAppSelector } from '../../hooks/customHooks';
 
 const GalleryPage = () => {
 
+   const articles = useAppSelector((state) => state.global.articles);
+   const images = articles.flatMap((article) => article.galleryImages ?? []);
    const [visibleCount, setVisibleCount] = useState(9);
-   const visibleImages = useMemo(() => images.slice(0, visibleCount), [visibleCount]);
+   const visibleImages = useMemo(() => images.slice(0, visibleCount), [visibleCount, images]);
 
    return (
       <>
@@ -35,9 +21,10 @@ const GalleryPage = () => {
          >
             {visibleImages.map((image) => (
                <img
-                  key={image.src}
+                  key={image.title}
                   src={image.src}
-                  alt={image.alt}
+                  title={image.title}
+                  alt={image.alt ?? image.title}
                   loading="lazy"
                   style={{
                      display: 'block',

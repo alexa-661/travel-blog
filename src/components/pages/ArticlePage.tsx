@@ -30,8 +30,9 @@ const ArticlePage = () => {
                }}
             >
                <img
-                  src={article.headerImage.src}
-                  alt={article.headerImage.alt}
+                  title={article.galleryImages[0].title}
+                  src={article.galleryImages[0].src}
+                  alt={article.galleryImages[0].alt ?? article.galleryImages[0].title}
                   loading="lazy"
                   style={{
                      width: '100%',
@@ -41,7 +42,7 @@ const ArticlePage = () => {
                   }} 
                />
             </div>
-            <figcaption>{article.headerImage.caption}</figcaption>
+            <figcaption>{article.galleryImages[0].caption ?? article.galleryImages[0].title}</figcaption>
          </figure>
          <div style={{ padding: '2rem', textAlign: 'left' }}>
             <article 

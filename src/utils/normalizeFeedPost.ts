@@ -41,24 +41,33 @@ export const parseExcerpt = (content: Document) =>
    return `${words.slice(0, MAX_EXCERPT_WORDCOUNT).join(' ')}...`;
 }
 
-export const parseHeaderImage = (content: Document) =>
+export const parseImages = (content: Document) =>
 {
-   const images = content.querySelectorAll('img');
-   const firstFigureCaption = content.querySelector('figcaption')?.textContent?.trim();
-   const descriptiveImages = Array.from(images).filter((image) => image.title.length > 0);
-   if (descriptiveImages.length === 0)
+   const seen = new Set<string>();
+   const images = Array.from(content.querySelectorAll('img')).flatMap((img) =>
    {
-      return {
-         src: '',
-         alt: '',
-         caption: 'No Image to Display'
+      const src = img.getAttribute('src');
+      if (src === null)
+      {
+         return [];
       }
-   }
 
-   return {
-      src: descriptiveImages[0].src,
-      alt: descriptiveImages[0].alt ?? 'Header Image',
-      caption: firstFigureCaption ?? descriptiveImages[0].title
-   }
+      if (seen.has(src)) return [];
+      seen.add(src);
+
+      const title = img.getAttribute('title');
+      const alt = img.getAttribute('alt');
+      const figure = img.closest('figure');
+      const caption = figure?.querySelector('figcaption')?.textContent?.trim();
+
+      return [{
+         title: title?.trim() || '',
+         src,
+         alt: alt?.trim() || '',
+         ... (caption ? { caption } : {}), //only add caption if it is present.
+      }];
+
+   });
+   return images;
 }
 

@@ -2,7 +2,7 @@ import { createSlice, configureStore, type PayloadAction, createAsyncThunk } fro
 import DOMPurify from 'dompurify';
 import { languageOptions } from '../constants/constants';
 import type { Article, ArticleLocation, Coordinates, FeedPost, GeoResult, Language } from '../types/types';
-import { parseExcerpt, parseHeaderImage, parseLocation } from '../utils/normalizeFeedPost';
+import { parseExcerpt, parseImages, parseLocation } from '../utils/normalizeFeedPost';
 
 type LoadingStatus = "idle" | "loading" | "succeeded" | "failed";
 
@@ -42,6 +42,7 @@ export const fetchFeedPosts = createAsyncThunk<Article[]>(
          {
             return [];
          }
+         const images = parseImages(contentHTML);
          return [{
             slug: post.title.toLowerCase().trim().replace(/\s+/g, '-'),
             title: post.title,
@@ -50,8 +51,7 @@ export const fetchFeedPosts = createAsyncThunk<Article[]>(
             content: DOMPurify.sanitize(post.content), //may not be necessary here
             excerpt:parseExcerpt(contentHTML),
             coordinates: null,
-            headerImage: parseHeaderImage(contentHTML),
-            // galleryImages?: Image[]
+            galleryImages: images
          }]
       });
       return normalizedData;

@@ -3,7 +3,8 @@ import type { languageOptions } from "../constants/constants";
 export interface Image
 {
    src: string;
-   alt: string;
+   title: string;
+   alt?: string;
    caption?: string;
 };
 
@@ -16,8 +17,7 @@ export interface Article
    content: string;
    excerpt: string;
    coordinates: Coordinates | null,
-   headerImage: Image,
-   galleryImages?: Image[]
+   galleryImages: Image[]
 }
 
 export type FeedPost = {
