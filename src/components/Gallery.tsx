@@ -20,7 +20,7 @@ const images = Object.entries(imageFiles).map(([path, src]) => ({
 const Gallery = () => {
 
    const [visibleCount, setVisibleCount] = useState(9);
-   const visibleImages = useMemo(() => images.slice(0, visibleCount), [images, visibleCount]);
+   const visibleImages = useMemo(() => images.slice(0, visibleCount), [visibleCount]);
 
    return (
       <>

@@ -1,12 +1,19 @@
+import { useState } from "react";
 import Articles from "./Articles"
 import GlobalMap from "./GlobalMap"
 
 
 const Home = () => {
+   const [selectedCountry, setSelectedCountry] = useState<string>('');
+   const handleCountryChange = (country: string) =>
+   {
+      setSelectedCountry(country);
+   }
+
    return (
       <>
-         <GlobalMap />
-         <Articles />
+         <GlobalMap selectedCountry={selectedCountry} />
+         <Articles selectedCountry={selectedCountry} onCountryChange={handleCountryChange} />
       </>
    )
 };

@@ -8,10 +8,9 @@ import { articles } from '../assets/articles/articles';
 
 setWorkerUrl(workerUrl);
 
-
-
-const GlobalMap = () => {
+const GlobalMap = (Props: { selectedCountry: string | null }) => {
    const mapContainer = useRef<HTMLDivElement>(null);
+   const mapRef = useRef<Map | null>(null);
    const navigate = useNavigate();
 
    useEffect(() =>
@@ -21,11 +20,13 @@ const GlobalMap = () => {
       const map = new Map({
          container: mapContainer.current,
          style: 'https://demotiles.maplibre.org/style.json', // style URL
-         center: [0, 0], // starting position [lng, lat]
-         zoom: 0, // starting zoom
+         center: [-3.7, 40.4], // starting position [lng, lat]
+         zoom: -1 , // starting zoom
          rollEnabled: true,
-
+         renderWorldCopies: false,
       });
+
+      mapRef.current = map;
 
             // Add zoom and rotation controls to the map.
       map.addControl(new maplibregl.NavigationControl({
@@ -68,10 +69,58 @@ const GlobalMap = () => {
 
       return () => {
          markers.forEach((marker) => marker.remove());
+         mapRef.current = null;
          map.remove();
       };
 
    }, [navigate]);
+
+   useEffect(() => {
+      const map = mapRef.current;
+      if (!map) return;
+
+      if (!Props.selectedCountry || Props.selectedCountry === null)
+      {
+         map.fitBounds([[-180, -85.051129], [180, 85.051129]],
+            { padding: 0, duration: 1000 });
+
+         //          map.flyTo({
+         //   center: [-3.7, 40.4],
+         //   zoom: -1,
+         //   duration: 1000,
+         // })
+
+         //             map.once('moveend', () => {
+         //   console.log('zoom:', map.getZoom(), 'bounds:', map.getBounds().toArray())
+         // })
+
+        return;
+      }
+   
+      const locations = articles.filter(
+        (article) => article.country === Props.selectedCountry
+      )
+   
+      if (locations.length === 0) return;
+   
+      if (locations.length > 0)
+      {
+        const { longitude, latitude } = locations[0].coordinates
+        map.flyTo({
+          center: [longitude, latitude],
+          zoom: 6,
+          duration: 1000,
+        })
+      }
+
+   const bounds = new maplibregl.LngLatBounds();
+   locations.forEach(({ coordinates }) =>
+   {
+      bounds.extend([coordinates.longitude, coordinates.latitude]);
+   })
+
+   map.fitBounds(bounds, { padding: 40, maxZoom: 6, duration: 1000 });
+}, [Props.selectedCountry]);
       
   return (
       <>

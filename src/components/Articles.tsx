@@ -1,16 +1,11 @@
 import { Link } from 'react-router';
 import { articles } from '../assets/articles/articles';
 import CountryFilter from './CountryFilter';
-import { useState } from 'react';
+import { useMemo } from 'react';
 
-const Articles = () =>
+const Articles = (Props: { selectedCountry: string, onCountryChange: (country: string) => void }) =>
 {
-   const [articlesToDisplay, setArticlesToDisplay] = useState(articles);
-
-   const handleCountryChange = (country: string) =>
-   {
-      setArticlesToDisplay(country ? articles.filter((article) => article.country === country) : articles);
-   }
+   const articlesToDisplay = useMemo(() => Props.selectedCountry !== '' ? articles.filter((article) => article.country === Props.selectedCountry) : articles, [Props.selectedCountry]);
 
    const articleJSX = articlesToDisplay.map((article) =>
    {
@@ -65,7 +60,7 @@ const Articles = () =>
 
    return (
    <div style={{ margin: '1rem' }}>
-      <CountryFilter onCountryChange={handleCountryChange} />
+      <CountryFilter selectedCountry={Props.selectedCountry} onCountryChange={Props.onCountryChange} />
       <section className="articles">{articleJSX}</section>;
    </div>
    )
