@@ -34,6 +34,8 @@ app.get('/api/posts', async (_req, res) => {
 
       console.log("Fetched new feed");
 
+      // articles.forEach((article) => { console.log('article title: ' + article.title) });
+
       articlesCache.articles = articles;
       articlesCache.fetchedAt = Date.now();
       return res.json(articles);
