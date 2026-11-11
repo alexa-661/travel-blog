@@ -1,3 +1,5 @@
+import type { languageOptions } from "../constants/constants";
+
 export interface Image
 {
    src: string;
@@ -22,3 +24,4 @@ export interface Article
    galleryImages?: Image[]
 }
 
+export type Language = (typeof languageOptions)[number]; //the type of any element in this array. 
