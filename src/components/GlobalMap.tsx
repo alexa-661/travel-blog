@@ -4,7 +4,8 @@ import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import { useEffect, useRef } from 'react';
 import * as maplibregl from 'maplibre-gl';
 import { useNavigate } from 'react-router';
-import { useAppSelector } from '../hooks/customHooks';
+import { useAppDispatch, useAppSelector } from '../hooks/customHooks';
+import { fetchCoordinates } from '../store/globalSlice';
 
 setWorkerUrl(workerUrl);
 
@@ -13,6 +14,9 @@ const GlobalMap = (Props: { selectedCountry: string | null }) => {
    const mapRef = useRef<Map | null>(null);
    const navigate = useNavigate();
    const articles = useAppSelector((state) => state.global.articles);
+   const articlesStatus = useAppSelector((state) => state.global.articlesStatus);
+   const coordinatesStatus = useAppSelector((state) => state.global.coordinatesStatus);
+   const dispatch = useAppDispatch();
 
    useEffect(() =>
    {
@@ -37,14 +41,18 @@ const GlobalMap = (Props: { selectedCountry: string | null }) => {
          showCompass: true
       }));
 
-      const markers = articles.map((article) => {
+      const markers = articles.flatMap((article) => {
+         if (article.coordinates === null)
+         {
+            return [];
+         }
          const popupContent = document.createElement('div');
 
          const title = document.createElement('strong');
          title.textContent = article.title;
 
          const location = document.createElement('p');
-         location.textContent = `${article.city}, ${article.country}`;
+         location.textContent = `${article.location.city}, ${article.location.country}`;
 
          const link = document.createElement('a');
          link.href = `/articles/${article.slug}`;
@@ -59,13 +67,15 @@ const GlobalMap = (Props: { selectedCountry: string | null }) => {
          const popup = new maplibregl.Popup({ offset: 25 })
             .setDOMContent(popupContent);
 
-         return new maplibregl.Marker()
-            .setLngLat([
-               article.coordinates.longitude,
-               article.coordinates.latitude,
-            ])
-            .setPopup(popup)
-            .addTo(map);
+         return [
+            new maplibregl.Marker()
+               .setLngLat([
+                  article.coordinates.longitude,
+                  article.coordinates.latitude,
+               ])
+               .setPopup(popup)
+               .addTo(map),
+         ];
       });
 
       return () => {
@@ -99,14 +109,14 @@ const GlobalMap = (Props: { selectedCountry: string | null }) => {
       }
    
       const locations = articles.filter(
-         (article) => article.country === Props.selectedCountry
+         (article) => article.location.country === Props.selectedCountry
       )
    
       if (locations.length === 0) return;
    
       if (locations.length > 0)
       {
-         const { longitude, latitude } = locations[0].coordinates
+         const { longitude, latitude } = locations[0].coordinates ?? { latitude: 0, longitude: 0};
          map.flyTo({
             center: [longitude, latitude],
             zoom: 6,
@@ -117,11 +127,24 @@ const GlobalMap = (Props: { selectedCountry: string | null }) => {
       const bounds = new maplibregl.LngLatBounds();
       locations.forEach(({ coordinates }) =>
       {
-         bounds.extend([coordinates.longitude, coordinates.latitude]);
+         if (coordinates !== null)
+         {
+            bounds.extend([coordinates.longitude, coordinates.latitude]);
+         }
       })
 
       map.fitBounds(bounds, { padding: 40, maxZoom: 6, duration: 1000 });
    }, [Props.selectedCountry, articles]);
+
+   useEffect(()=>
+   {
+      if ( articlesStatus !== 'succeeded' || articles.length === 0 || coordinatesStatus !== 'idle')
+      {
+         return;
+      }
+      const locations = articles.map((article) => article.location);
+      dispatch(fetchCoordinates(locations));
+   }, [articles, dispatch, articlesStatus, coordinatesStatus])
       
    return (
       <>
@@ -129,6 +152,12 @@ const GlobalMap = (Props: { selectedCountry: string | null }) => {
             ref={mapContainer}
             style={{ width: '100%', height: '400px' }}
          />
+         <p>
+            Geocoding: ©
+            <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">
+               OpenStreetMap contributors
+            </a>
+         </p>
       </>
    );
 };
