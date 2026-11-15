@@ -6,6 +6,11 @@ A travel blog built with React, TypeScript, and Vite. The frontend displays post
 
 - Node.js compatible with Vite 8
 - pnpm
+- CMake
+- Ninja
+- C++ compiler
+
+For windows development, the thumbnailer is built using the MSYS2 UCTR64 toolchain. 
 
 ## Setup
 
@@ -56,6 +61,21 @@ pnpm build    # Type-check and create a production build
 pnpm lint     # Run ESLint
 pnpm preview  # Preview the production build locally
 ```
+
+## Thumbnailer
+
+The repository includes a standalone C++ thumbnail generation tool.
+
+The thumbnailer:
+- loads images using `stb_image`
+- resizes images while preserving aspect ratio
+- writes compressed JPEG thumbnails
+
+From an MSYS2 UCRT64 terminal, build and run the C++ thumbnailer separately:
+
+```bash
+bash tools/thumbnailer/build.sh
+bash tools/thumbnailer/run.sh
 
 ## API Endpoints
 

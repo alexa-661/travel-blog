@@ -13,6 +13,9 @@ dist-ssr
 *.local
 package-lock.json
 .env
+*.exe
+*_thumb.jpg
+/tools/thumbnailer/build/
 
 # Editor directories and files
 .vscode/*
