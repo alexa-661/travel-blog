@@ -1,7 +1,7 @@
 import {Map, setWorkerUrl} from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as maplibregl from 'maplibre-gl';
 import { useNavigate } from 'react-router';
 import { useAppDispatch, useAppSelector } from '../hooks/customHooks';
@@ -16,6 +16,7 @@ const GlobalMap = (Props: { selectedCountry: string | null }) => {
    const mapContainer = useRef<HTMLDivElement>(null);
    const mapRef = useRef<Map | null>(null);
    const navigate = useNavigate();
+   const [mapCreated, setMapCreated] = useState(false);
    const articles = useAppSelector((state) => state.global.articles);
    const articlesStatus = useAppSelector((state) => state.global.articlesStatus);
    const coordinatesStatus = useAppSelector((state) => state.global.coordinatesStatus);
@@ -45,6 +46,7 @@ const GlobalMap = (Props: { selectedCountry: string | null }) => {
       mapRef.current = map;
 
       map.once('load', () => {
+         setMapCreated(true);
          map.setPaintProperty('background', 'background-color', '#F2E6D8');
          map.setPaintProperty('countries-fill', 'fill-color', '#68A69B');
          map.setPaintProperty('countries-boundary', 'line-color', '#2D6673');
@@ -60,6 +62,27 @@ const GlobalMap = (Props: { selectedCountry: string | null }) => {
          showCompass: true
       }));
 
+      map.once('idle', () =>
+      {
+         if (container) {
+            container.style.opacity = '1';
+         }
+      });
+
+      return () => {
+         if (container)
+         {
+            container.style.opacity = '0';
+         }
+         mapRef.current = null;
+         map.remove();
+      };
+
+   }, []);
+
+   useEffect(() => {
+      const map = mapRef.current;
+      if (!map || !mapCreated) return;
       const markers = articles.flatMap((article) => {
          if (article.coordinates === null)
          {
@@ -97,28 +120,16 @@ const GlobalMap = (Props: { selectedCountry: string | null }) => {
          ];
       });
 
-      map.once('idle', () =>
+      return(()=>
       {
-         if (container) {
-            container.style.opacity = '1';
-         }
+         markers.forEach((marker) => marker.remove());
       });
 
-      return () => {
-         if (container)
-         {
-            container.style.opacity = '0';
-         }
-         markers.forEach((marker) => marker.remove());
-         mapRef.current = null;
-         map.remove();
-      };
-
-   }, [navigate, articles]);
+   }, [articles, navigate, mapCreated]);
 
    useEffect(() => {
       const map = mapRef.current;
-      if (!map) return;
+      if (!map || !mapCreated) return;
 
       if (!Props.selectedCountry || Props.selectedCountry === null)
       {
@@ -153,7 +164,7 @@ const GlobalMap = (Props: { selectedCountry: string | null }) => {
       });
 
       map.fitBounds(bounds, { padding: 40, maxZoom: 6, duration: 1000 });
-   }, [Props.selectedCountry, articles]);
+   }, [Props.selectedCountry, articles, mapCreated]);
 
    useEffect(()=>
    {
