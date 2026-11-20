@@ -12,7 +12,7 @@ setWorkerUrl(workerUrl);
 const DEFAULT_MAP_CENTER: [number, number] = [-3, 30];
 const DEFAULT_MAP_ZOOM = 0;
 
-const GlobalMap = (Props: { selectedCountry: string | null }) => {
+const GlobalMap = (Props: { selectedCountry: string }) => {
    const mapContainer = useRef<HTMLDivElement>(null);
    const mapRef = useRef<Map | null>(null);
    const navigate = useNavigate();

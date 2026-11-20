@@ -7,8 +7,75 @@ const parser = new Parser();
 const GEOCODE_MAX_REQUEST_TIME_MS = 1000;
 const ARTICLES_CACHE_TTL_MS = 10 * 60 * 1000;
 const articlesCache = { articles: [], fetchedAt: 0 };
+const RSS_MAX_ATTEMPTS = 5;
+const RSS_RETRY_DELAY_MS = 1000;
+const RSS_MAX_REQUEST_TIME_MS = 3000;
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-app.use(express.json({ limit: '10kb' })); //limit JSON requests
+app.use(express.json({ limit: '10kb' }));
+
+const fetchFeed = async (feedUrl) =>
+{
+   const controller = new AbortController();
+
+   const timeoutId = setTimeout(() =>
+   {
+      controller.abort();
+   }, RSS_MAX_REQUEST_TIME_MS);
+
+   try
+   {
+      const response = await fetch(feedUrl, {
+         signal: controller.signal,
+      });
+
+      if (!response.ok) {
+         throw new Error(`RSS request failed: ${response.status}`);
+      }
+
+      const xml = await response.text();
+
+      return parser.parseString(xml);
+   }
+   finally
+   {
+      clearTimeout(timeoutId);
+   }
+}
+
+const fetchFeedWithRetry = async (feedUrl) =>
+{
+   let lastError;
+
+   for (let attempt = 1; attempt <= RSS_MAX_ATTEMPTS; attempt++)
+   {
+      try
+      {
+         console.log(`Fetching RSS feed (attempt ${attempt}/${RSS_MAX_ATTEMPTS})`);
+         return await fetchFeed(feedUrl);
+      }
+      catch (error)
+      {
+         lastError = error;
+
+         if (error.name === 'AbortError')
+         {
+            console.error(`RSS request timed out (attempt ${attempt})`);
+         }
+         else
+         {
+            console.error(`RSS fetch failed (attempt ${attempt})`, error);
+         }
+
+         if (attempt < RSS_MAX_ATTEMPTS)
+         {
+            await delay(RSS_RETRY_DELAY_MS);
+         }
+      }
+   }
+
+   throw lastError;
+};
 
 //Substack RSS Feed
 app.get('/api/posts', async (_req, res) => {
@@ -22,7 +89,7 @@ app.get('/api/posts', async (_req, res) => {
    }
 
    try {
-      const feed = await parser.parseURL(feedUrl);
+      const feed = await fetchFeedWithRetry(feedUrl);
       const articles = feed.items.map((item) => ({
          title: item.title,
          subTitle: item.description,
