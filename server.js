@@ -9,50 +9,51 @@ const ARTICLES_CACHE_TTL_MS = 10 * 60 * 1000;
 const articlesCache = { articles: [], fetchedAt: 0 };
 const RSS_MAX_ATTEMPTS = 5;
 const RSS_RETRY_DELAY_MS = 1000;
-const RSS_MAX_REQUEST_TIME_MS = 3000;
+const RSS_MAX_REQUEST_TIMEOUT_MS = 3000;
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 app.use(express.json({ limit: '10kb' }));
 
-const fetchFeed = async (feedUrl) =>
+const fetchWithTimeout = async (url, options, timeoutMS) =>
 {
    const controller = new AbortController();
 
    const timeoutId = setTimeout(() =>
    {
       controller.abort();
-   }, RSS_MAX_REQUEST_TIME_MS);
+   }, timeoutMS);
 
    try
    {
-      const response = await fetch(feedUrl, {
+      const response = await fetch(url, {
+         ...options,
          signal: controller.signal,
       });
 
       if (!response.ok) {
-         throw new Error(`RSS request failed: ${response.status}`);
+         throw new Error(`Request failed: ${response.status}`);
       }
 
-      const xml = await response.text();
-
-      return parser.parseString(xml);
+      return response;
    }
    finally
    {
       clearTimeout(timeoutId);
    }
-}
+};
 
-const fetchFeedWithRetry = async (feedUrl) =>
+const fetchUrlWithRetry = async (url, options, maxAttempts, retryDelayMS, requestTimeoutMS) =>
 {
    let lastError;
 
-   for (let attempt = 1; attempt <= RSS_MAX_ATTEMPTS; attempt++)
+   for (let attempt = 1; attempt <= maxAttempts; attempt++)
    {
       try
       {
-         console.log(`Fetching RSS feed (attempt ${attempt}/${RSS_MAX_ATTEMPTS})`);
-         return await fetchFeed(feedUrl);
+         //ok to log URL for a non production build
+         console.log(`Fetching url ${url} (attempt ${attempt}/${maxAttempts})`);
+         const response = await fetchWithTimeout(url, options, requestTimeoutMS);
+         return response;
       }
       catch (error)
       {
@@ -60,16 +61,16 @@ const fetchFeedWithRetry = async (feedUrl) =>
 
          if (error.name === 'AbortError')
          {
-            console.error(`RSS request timed out (attempt ${attempt})`);
+            console.error(`Fetch url ${url} timed out (attempt ${attempt})`);
          }
          else
          {
-            console.error(`RSS fetch failed (attempt ${attempt})`, error);
+            console.error(`Fetch url ${url} failed (attempt ${attempt})`, error);
          }
 
-         if (attempt < RSS_MAX_ATTEMPTS)
+         if (attempt < maxAttempts)
          {
-            await delay(RSS_RETRY_DELAY_MS);
+            await delay(retryDelayMS);
          }
       }
    }
@@ -89,7 +90,9 @@ app.get('/api/posts', async (_req, res) => {
    }
 
    try {
-      const feed = await fetchFeedWithRetry(feedUrl);
+      const response = await fetchUrlWithRetry(feedUrl, {}, RSS_MAX_ATTEMPTS, RSS_RETRY_DELAY_MS, RSS_MAX_REQUEST_TIMEOUT_MS);
+      const xml = await response.text();
+      const feed = await parser.parseString(xml);
       const articles = feed.items.map((item) => ({
          title: item.title,
          subTitle: item.description,
@@ -112,6 +115,7 @@ app.get('/api/posts', async (_req, res) => {
       console.error(error);
       if (cachedFeed)
       {
+         console.warn('RSS unavailiable, Returning cached articles.');
          return res.json(cachedFeed.articles);
       }
       return res.status(500).json({ error: 'Could not load the Substack feed.' });
@@ -146,19 +150,22 @@ app.post('/api/geocode', async (req, res) =>
 })
 
 const geocodeCache = new Map(); //storage cache, holds information for as long as the service is running.
-let geocodeQueue = [];
+const geocodeQueue = [];
 let queueIsRunning = false;
 let queueTimerId = null;
+const NOMINATIM_MAX_RETRY_ATTEMPTS = 5;
+const NOMINATIM_RETRY_DELAY_MS = 1000;
+const NOMINATIM_MAX_REQUEST_TIME_MS = 3000;
 
 const geocodeLocation = (city, country) =>
 {
   const key = `${city.trim().toLowerCase()}|${country.trim().toLowerCase()}`
   if (geocodeCache.has(key))
   {
-   const result = geocodeCache.get(key);
-      console.log("result is in the cache:");
+      const result = geocodeCache.get(key);
+      console.log("Result is in the cache:");
       console.dir(result);
-    return Promise.resolve(result);
+      return Promise.resolve(result);
   }
 
   return new Promise((resolve, reject) =>{
@@ -192,14 +199,15 @@ const processNextGeocode = async () =>
    {
       request.reject(error);
    }
-
-   queueIsRunning = false;
-
-   if (geocodeQueue.length > 0 && queueTimerId === null)
+   finally
    {
-      queueTimerId = setTimeout(() => { queueTimerId = null; processNextGeocode()}, GEOCODE_MAX_REQUEST_TIME_MS);
-   }
+      queueIsRunning = false;
 
+      if (geocodeQueue.length > 0 && queueTimerId === null)
+      {
+         queueTimerId = setTimeout(() => { queueTimerId = null; processNextGeocode()}, GEOCODE_MAX_REQUEST_TIME_MS);
+      }
+   }
 }
 
 const requestNominatim = async (city, country) =>
@@ -209,24 +217,24 @@ const requestNominatim = async (city, country) =>
    url.searchParams.set('format', 'jsonv2');
    url.searchParams.set('limit', '1');
 
-   const response = await fetch(url, {
-      headers:
+   const response = await fetchUrlWithRetry(url,
       {
-         'User-Agent': 'TravelBlog/1.0 (local development)', //change this to a public URL when site is live
+         headers:
+         {
+            'User-Agent': 'TravelBlog/1.0 (local development)', //change this to a public URL when site is live
+         }
       },
-   });
+      NOMINATIM_MAX_RETRY_ATTEMPTS,
+      NOMINATIM_RETRY_DELAY_MS,
+      NOMINATIM_MAX_REQUEST_TIME_MS
+   );
 
-   if (!response.ok)
-   {
-      throw new Error(`Nominatim request failed: ${response.status}`);
-   }
-
-  const results = await response.json();
+  const results = await response.json();  
   const result = results[0];
 
    if (!result)
    {
-    return null;
+      return null;
    }
 
    const latitude = Number(result.lat);
