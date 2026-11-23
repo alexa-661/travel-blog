@@ -7,6 +7,7 @@ add_executable(thumbnailer
     src/ImageLoader.cpp
     src/ImageResizer.cpp
     src/stb_implementation.cpp
+    src/FileValidator.cpp
 )
 
 set_target_properties(thumbnailer PROPERTIES

@@ -7,6 +7,7 @@
 #include <vector>
 #include "ImageLoader.h"
 #include "ImageResizer.h"
+#include "FileValidator.h"
 
 #include "../third_party/stb/stb_image_write.h"
 
@@ -21,42 +22,12 @@ int main(int argc, char* argv[])
    const std::filesystem::path inputPath(argv[1]);
    const std::filesystem::path outputPath(argv[2]);
 
-   std::error_code error;
-   if (!std::filesystem::is_regular_file(inputPath, error))
+   if (!FileValidator::validate(inputPath, outputPath))
    {
-      std::cerr << "Input is not a file: " << inputPath << "\n";
-      return 1;
+      std::cerr << "The input or output path could not be validated.\n";
    }
 
-   const auto canonicalInput = std::filesystem::weakly_canonical(inputPath, error);
-   if (error)
-   {
-      std::cerr << "Could not resolve input path: " << error.message() << "\n";
-      return 1;
-   }
-
-   const auto canonicalOutput = std::filesystem::weakly_canonical(outputPath, error);
-   if (error)
-   {
-      std::cerr << "Could not resolve output path: " << error.message() << "\n";
-      return 1;
-   }
-
-   if (canonicalInput == canonicalOutput)
-   {
-      std::cerr << "Input and output must be different files.\n";
-      return 1;
-   }
-
-   const auto outputDirectory = outputPath.parent_path();
-   if (!outputDirectory.empty() &&
-       !std::filesystem::is_directory(outputDirectory, error))
-   {
-      std::cerr << "Output directory does not exist: " << outputDirectory << "\n";
-      return 1;
-   }
-
-   const std::string inputFilename = inputPath.string();
+   // const std::string inputFilename = inputPath.string();
    const std::string outputFilename = outputPath.string();
 
    ImageLoader loader;
