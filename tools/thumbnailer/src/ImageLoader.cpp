@@ -1,6 +1,7 @@
 #include "ImageLoader.h"
 #include <iostream>
 #include <vector>
+#include "../third_party/stb/stb_image.h"
 
 std::optional<Image> ImageLoader::load(const std::filesystem::path& path)
 {
@@ -40,7 +41,7 @@ std::optional<Image> ImageLoader::load(const std::filesystem::path& path)
     return Image(
       width,
       height,
-      3,
+      Image::ChannelOptions::RGB,
       pixels
    );
 }

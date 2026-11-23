@@ -42,7 +42,7 @@ bool ImageResizer::resize(const Image& inputImage, Image& outputImage)
 
    outputImage.width = outputWidth;
    outputImage.height = outputHeight;
-   outputImage.channels = 3;
+   outputImage.channels = Image::ChannelOptions::RGB;
    outputImage.pixels = std::move(resizedPixels);
    return true;
 }

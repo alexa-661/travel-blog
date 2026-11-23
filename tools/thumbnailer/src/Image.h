@@ -3,19 +3,33 @@
 
 #include <memory>
 #include <vector>
-#include "../third_party/stb/stb_image.h"
 
 struct Image
 {
+    enum class ChannelOptions
+    {
+        Gray = 1,
+        RGB = 3,
+        RGBA = 4
+    };
+
     int width;
     int height;
-    int channels;
+    ChannelOptions channels;
 
     // Alexa: rbg values are unsigned, up to one byte of memory per pixel. 
     std::vector<unsigned char> pixels;
 
+    Image()
+    {
+        width = 0;
+        height = 0;
+        channels = ChannelOptions::RGB; 
+        pixels = {};
+    }
+
     //Alexa: std::move prevents allocating more memory, which is important for large photos. 
-    Image (int w, int h, int c, std::vector<unsigned char> pixels) : width(w), height(h), channels(c), pixels(std::move(pixels))
+    Image (int w, int h, ChannelOptions c, std::vector<unsigned char> pixels) : width(w), height(h), channels(c), pixels(std::move(pixels))
     {}
 };
 

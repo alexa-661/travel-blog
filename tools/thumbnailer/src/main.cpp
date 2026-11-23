@@ -8,6 +8,7 @@
 #include "ImageLoader.h"
 #include "ImageResizer.h"
 #include "FileValidator.h"
+#include "Image.h"
 
 #include "../third_party/stb/stb_image_write.h"
 
@@ -43,7 +44,7 @@ int main(int argc, char* argv[])
 
    std::cout << inputImage->width << "x" << inputImage->height << "\n";
 
-   Image outputImage = Image(0, 0, 3, {});
+   Image outputImage = Image();
 
    if (!ImageResizer::resize(*inputImage, outputImage))
    {
@@ -57,7 +58,7 @@ int main(int argc, char* argv[])
           outputFilename.c_str(),
           outputImage.width,
           outputImage.height,
-          3,
+          static_cast<int>(Image::ChannelOptions::RGB),
           outputImage.pixels.data(),
           100))
    {
