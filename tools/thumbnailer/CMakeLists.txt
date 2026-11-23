@@ -4,6 +4,7 @@ project(thumbnailer LANGUAGES CXX)
 
 add_executable(thumbnailer
     src/main.cpp
+    src/Thumbnailer.cpp
     src/ImageLoader.cpp
     src/ImageResizer.cpp
     src/stb_implementation.cpp
