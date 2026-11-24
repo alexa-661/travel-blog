@@ -1,44 +1,59 @@
+import type { ArticleLocation, Coordinates, GeoResult } from '../shared/types.js';
 import { fetchWithRetry } from './fetchUtils.js';
 
+type GeocodeRequest = ArticleLocation &
+   {
+      key: string;
+      resolve: (value: Coordinates | null) => void;
+      reject: (reason?: unknown) => void; 
+   }
+
+type NominatimResult =
+   {
+      lat: string;
+      lon: string;
+   };
+
 const NOMINATIM_QUEUE_DELAY_MS = 1000;
-const geocodeCache = new Map(); //storage cache, holds information for as long as the service is running.
-const geocodeQueue = [];
+const geocodeCache = new Map<string, Coordinates>(); //storage cache, holds information for as long as the service is running.
+const geocodeQueue: GeocodeRequest[] = [];
 let queueIsRunning = false;
-let queueTimerId = null;
+let queueTimerId: ReturnType<typeof setTimeout> | null = null;
 const NOMINATIM_MAX_RETRY_ATTEMPTS = 5;
 const NOMINATIM_RETRY_DELAY_MS = 1000;
 const NOMINATIM_MAX_REQUEST_TIME_MS = 3000;
 
-export const getGeocodeLocations = async (locations) =>
+export const getGeocodeLocations = async (locations: ArticleLocation[]): Promise<GeoResult[]> =>
 {
    return Promise.all(
       locations.map(async ({city, country}) =>
-      ({
-         city,
-         country,
-         coordinates: await getGeocodeLocation(city, country)
-      }))
+         ({
+            city,
+            country,
+            coordinates: await getGeocodeLocation(city, country)
+         }))
    );
 };
 
-const getGeocodeLocation = async (city, country) =>
+const getGeocodeLocation = (city: string, country: string): Promise<Coordinates | null> =>
 {
-  const key = `${city.trim().toLowerCase()}|${country.trim().toLowerCase()}`
-  if (geocodeCache.has(key))
-  {
-      const result = geocodeCache.get(key);
-      console.log("Result is in the cache:");
-      console.dir(result);
-      return Promise.resolve(result);
-  }
+   const key = `${city.trim().toLowerCase()}|${country.trim().toLowerCase()}`
+   const cachedResult = geocodeCache.get(key);
 
-  return new Promise((resolve, reject) =>{
+   if (cachedResult !== undefined)
+   {
+      console.log("Result is in the cache:");
+      console.dir(cachedResult);
+      return Promise.resolve(cachedResult);
+   }
+
+   return new Promise((resolve, reject) =>{
       geocodeQueue.push({ city, country, key, resolve, reject });
       if (!queueIsRunning && queueTimerId === null)
       {
-        void processNextGeocode();
+         void processNextGeocode();
       }
-  });
+   });
 }
 
 const processNextGeocode = async () =>
@@ -56,8 +71,13 @@ const processNextGeocode = async () =>
          request.country
       )
 
-      geocodeCache.set(request.key, coordinates);
+      if (coordinates !== null)
+      {
+         geocodeCache.set(request.key, coordinates);
+      }
+
       request.resolve(coordinates);
+
    }
    catch (error)
    {
@@ -74,7 +94,7 @@ const processNextGeocode = async () =>
    }
 }
 
-const requestNominatim = async (city, country) =>
+const requestNominatim = async (city:string, country:string): Promise<Coordinates | null> =>
 {
    const url = new URL('https://nominatim.openstreetmap.org/search');
    url.searchParams.set('q', `${city}, ${country}`);
@@ -93,8 +113,8 @@ const requestNominatim = async (city, country) =>
       NOMINATIM_MAX_REQUEST_TIME_MS
    );
 
-  const results = await response.json();  
-  const result = results[0];
+   const results = await response.json() as NominatimResult[];  
+   const result = results[0];
 
    if (!result)
    {

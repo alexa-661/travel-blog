@@ -1,7 +1,7 @@
 import 'dotenv/config'
 import express from 'express'
 import { getArticles } from './rss.js';
-import { getGeocodeLocations } from './geocode.js';
+import { getGeocodeLocations } from './geoCode.js';
 
 
 const app = express();
@@ -49,6 +49,6 @@ app.post('/api/contact', async (_req, res) =>
 
 
 app.listen(3001, () => {
-  console.log('API listening at http://localhost:3001.')
+   console.log('API listening at http://localhost:3001.')
 })
 

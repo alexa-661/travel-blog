@@ -13,6 +13,7 @@ dist-ssr
 *.local
 package-lock.json
 .env
+*.tsbuildinfo
 
 # Editor directories and files
 .vscode/*

@@ -1,6 +1,7 @@
 import { createSlice, configureStore, type PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { languageOptions } from '../constants/constants';
-import type { Article, ArticleLocation, Coordinates, FeedPost, GeoResult, Language, Image } from '../types/types';
+import type { Article, FeedPost, Language, Image } from '../types/types';
+import type { GeoResult, ArticleLocation, Coordinates } from '../../shared/types'
 import { parseContent, parseExcerpt, parseLocation } from '../utils/normalizeFeedPost';
 
 type LoadingStatus = "idle" | "loading" | "succeeded" | "failed";
@@ -122,7 +123,8 @@ const globalSlice = createSlice({
                   article.location.country.trim().toLowerCase();
 
                const coordinates = coordinatesByLocation.get(key);
-               if (coordinates) {
+               if (coordinates !== null && coordinates !== undefined)
+               {
                   article.coordinates = coordinates;
                }
             });            

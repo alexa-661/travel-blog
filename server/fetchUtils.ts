@@ -1,8 +1,13 @@
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export const fetchWithRetry = async (url, options, maxAttempts, retryDelayMS, requestTimeoutMS) =>
+export const fetchWithRetry = async (
+   url: string | URL,
+   options: RequestInit,
+   maxAttempts: number,
+   retryDelayMS: number,
+   requestTimeoutMS: number): Promise<Response> =>
 {
-   let lastError;
+   let lastError: unknown;
 
    for (let attempt = 1; attempt <= maxAttempts; attempt++)
    {
@@ -17,7 +22,7 @@ export const fetchWithRetry = async (url, options, maxAttempts, retryDelayMS, re
       {
          lastError = error;
 
-         if (error.name === 'AbortError')
+         if (error instanceof DOMException && error.name === 'AbortError')
          {
             console.error(`Fetch url ${url} timed out (attempt ${attempt})`);
          }
@@ -36,7 +41,7 @@ export const fetchWithRetry = async (url, options, maxAttempts, retryDelayMS, re
    throw lastError;
 };
 
-const fetchWithTimeout = async (url, options, timeoutMS) =>
+const fetchWithTimeout = async (url: string | URL, options: RequestInit, timeoutMS: number): Promise<Response> =>
 {
    const controller = new AbortController();
 

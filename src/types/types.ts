@@ -1,3 +1,4 @@
+import type { ArticleLocation, Coordinates } from "../../shared/types";
 import type { languageOptions } from "../constants/constants";
 
 export interface Image
@@ -29,15 +30,3 @@ export type FeedPost = {
 };
 
 export type Language = (typeof languageOptions)[number]; //the type of any element in this array. 
-
-export type Coordinates = {
-   latitude: number;
-   longitude: number;
-}
-
-export type ArticleLocation = {
-   city: string;
-   country: string;
-}
-
-export type GeoResult = ArticleLocation & { coordinates: Coordinates };
